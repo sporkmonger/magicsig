@@ -13,8 +13,8 @@
 #    limitations under the License.
 
 # Used to prevent the class/module from being loaded more than once
-unless defined? Salmon::VERSION
-  module Salmon
+unless defined? MagicSig::VERSION
+  module MagicSig
     module VERSION
       MAJOR = 0
       MINOR = 1

@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'salmon'
-require 'salmon/signature'
+require 'magicsig'
+require 'magicsig/signature'
 require 'openssl'
 
-module Salmon
+module MagicSig
   class Envelope
     def data
       @data ||= nil
@@ -24,7 +24,7 @@ module Salmon
 
     def data=(new_data)
       @data = new_data.gsub(/[\s=]/, '')
-      @payload = Salmon.base64url_decode(@data)
+      @payload = MagicSig.base64url_decode(@data)
     end
 
     def payload
@@ -33,7 +33,7 @@ module Salmon
 
     def payload=(new_payload)
       @payload = new_payload
-      @data = Salmon.base64url_encode(@payload)
+      @data = MagicSig.base64url_encode(@payload)
     end
 
     def data_type
@@ -66,12 +66,12 @@ module Salmon
 
     def message_string
       # Note: This message string will not be compatible with earlier
-      # implementations of Salmon that did not strip padding.
+      # implementations of MagicSig that did not strip padding.
       return [
         self.data,
-        Salmon.base64url_encode(self.data_type),
-        Salmon.base64url_encode(self.encoding),
-        Salmon.base64url_encode(self.algorithm)
+        MagicSig.base64url_encode(self.data_type),
+        MagicSig.base64url_encode(self.encoding),
+        MagicSig.base64url_encode(self.algorithm)
       ].join('.')
     end
 
@@ -102,7 +102,7 @@ module Salmon
         raise ArgumentError, "Expected 'sigs' to contain a list of signatures."
       end
       for sig in data['sigs']
-        self.signatures << Salmon::Signature.new.parse_json(sig)
+        self.signatures << MagicSig::Signature.new.parse_json(sig)
       end
       return self
     end
@@ -114,7 +114,7 @@ module Salmon
       elsif !data.kind_of?(Hash)
         raise TypeError, "Expected Hash or String, got #{data.class}."
       end
-      return Salmon::Envelope.new.parse_json(data)
+      return MagicSig::Envelope.new.parse_json(data)
     end
 
     def self.parse_xml(data)

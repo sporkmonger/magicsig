@@ -18,11 +18,11 @@ rescue LoadError
   exit(1)
 end
 
-require File.join(File.dirname(__FILE__), 'lib/salmon', 'version')
+require File.join(File.dirname(__FILE__), 'lib/magicsig', 'version')
 
-PKG_DISPLAY_NAME   = 'Salmon'
+PKG_DISPLAY_NAME   = 'MagicSig'
 PKG_NAME           = PKG_DISPLAY_NAME.downcase
-PKG_VERSION        = Salmon::VERSION::STRING
+PKG_VERSION        = MagicSig::VERSION::STRING
 PKG_FILE_NAME      = "#{PKG_NAME}-#{PKG_VERSION}"
 
 RELEASE_NAME       = "REL #{PKG_VERSION}"
@@ -37,7 +37,7 @@ PKG_AUTHOR_EMAIL   = 'bob@sporkmonger.com'
 PKG_HOMEPAGE       = RUBY_FORGE_URL
 PKG_SUMMARY        = 'Package Summary'
 PKG_DESCRIPTION    = <<-TEXT
-An implementation of the Salmon Protocol for Ruby.
+An implementation of Magic Signatures for Ruby.
 TEXT
 
 PKG_FILES = FileList[

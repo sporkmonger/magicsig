@@ -14,10 +14,10 @@
 
 require 'spec_helper'
 
-require 'salmon/envelope'
-require 'salmon/signature'
+require 'magicsig/envelope'
+require 'magicsig/signature'
 
-shared_examples_for 'normal salmon envelopes' do
+shared_examples_for 'normal magic signature envelopes' do
   it 'should parse the data correctly' do
     @envelope.data.should == 'Tm90IHJlYWxseSBBdG9t'
   end
@@ -44,7 +44,7 @@ shared_examples_for 'normal salmon envelopes' do
 
   it 'should parse at least one signature' do
     @envelope.signatures.should_not be_empty
-    @envelope.signatures.first.should be_kind_of(Salmon::Signature)
+    @envelope.signatures.first.should be_kind_of(MagicSig::Signature)
   end
 
   it 'should generate the message string correctly' do
@@ -54,47 +54,47 @@ shared_examples_for 'normal salmon envelopes' do
   end
 end
 
-describe Salmon::Envelope, 'created piecewise' do
+describe MagicSig::Envelope, 'created piecewise' do
   before do
-    @envelope = Salmon::Envelope.new
+    @envelope = MagicSig::Envelope.new
     @envelope.data = 'Tm90IHJlYWxseSBBdG9t'
     @envelope.data_type = 'application/atom+xml'
     @envelope.encoding = 'base64url'
     @envelope.algorithm = 'RSA-SHA256'
-    signature = Salmon::Signature.new
+    signature = MagicSig::Signature.new
     signature.value = (
       'EvGSD2vi8qYcveHnb-rrlok07qnCXjn8YSeCDDXlbh' +
       'ILSabgvNsPpbe76up8w63i2fWHvLKJzeGLKfyHg8ZomQ'
     )
-    signature.keyhash = '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
+    signature.key_id = '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
     @envelope.signatures << signature
   end
 
-  it_should_behave_like 'normal salmon envelopes'
+  it_should_behave_like 'normal magic signature envelopes'
 end
 
-describe Salmon::Envelope, 'created in non-canonical form' do
+describe MagicSig::Envelope, 'created in non-canonical form' do
   before do
-    @envelope = Salmon::Envelope.new
+    @envelope = MagicSig::Envelope.new
     @envelope.data = "\t\tTm9  \t0IHJl\n  YWxseSBBdG9t\n\n\n    "
     @envelope.data_type = 'application/atom+xml'
     @envelope.encoding = 'base64url'
     @envelope.algorithm = 'RSA-SHA256'
-    signature = Salmon::Signature.new
+    signature = MagicSig::Signature.new
     signature.value = (
       'EvGSD2vi8qYcveHnb-rrlok07qnCXjn8YSeCDDXlbh' +
       'ILSabgvNsPpbe76up8w63i2fWHvLKJzeGLKfyHg8ZomQ'
     )
-    signature.keyhash = '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
+    signature.key_id = '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
     @envelope.signatures << signature
   end
 
-  it_should_behave_like 'normal salmon envelopes'
+  it_should_behave_like 'normal magic signature envelopes'
 end
 
-describe Salmon::Envelope, 'with a JSON serialization' do
+describe MagicSig::Envelope, 'with a JSON serialization' do
   before do
-    @envelope = Salmon::Envelope.parse_json(<<-JSON.strip)
+    @envelope = MagicSig::Envelope.parse_json(<<-JSON.strip)
       {
         "data": "Tm90IHJlYWxseSBBdG9t",
         "data_type": "application/atom+xml",
@@ -102,18 +102,18 @@ describe Salmon::Envelope, 'with a JSON serialization' do
         "alg": "RSA-SHA256",
         "sigs": [{
           "value": "EvGSD2vi8qYcveHnb-rrlok07qnCXjn8YSeCDDXlbhILSabgvNsPpbe76up8w63i2fWHvLKJzeGLKfyHg8ZomQ",
-          "keyhash": "4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI="
+          "key_id": "4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI="
         }]
       }
     JSON
   end
 
-  it_should_behave_like 'normal salmon envelopes'
+  it_should_behave_like 'normal magic signature envelopes'
 end
 
-describe Salmon::Envelope, 'with a pre-parsed JSON hash' do
+describe MagicSig::Envelope, 'with a pre-parsed JSON hash' do
   before do
-    @envelope = Salmon::Envelope.parse_json({
+    @envelope = MagicSig::Envelope.parse_json({
       'data' => 'Tm90IHJlYWxseSBBdG9t',
       'data_type' => 'application/atom+xml',
       'encoding' => 'base64url',
@@ -123,10 +123,10 @@ describe Salmon::Envelope, 'with a pre-parsed JSON hash' do
           'EvGSD2vi8qYcveHnb-rrlok07qnCXjn8YSeCDDXlbh' +
           'ILSabgvNsPpbe76up8w63i2fWHvLKJzeGLKfyHg8ZomQ'
         ),
-        'keyhash' => '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
+        'key_id' => '4k8ikoyC2Xh+8BiIeQ+ob7Hcd2J7/Vj3uM61dy9iRMI='
       }]
     })
   end
 
-  it_should_behave_like 'normal salmon envelopes'
+  it_should_behave_like 'normal magic signature envelopes'
 end

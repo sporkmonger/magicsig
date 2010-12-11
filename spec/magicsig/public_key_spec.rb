@@ -14,7 +14,7 @@
 
 require 'spec_helper'
 
-require 'salmon/public_key'
+require 'magicsig/public_key'
 
 shared_examples_for 'normal public keys' do
   it 'should have the correct modulus and exponent' do
@@ -27,9 +27,9 @@ shared_examples_for 'normal public keys' do
   end
 end
 
-describe Salmon::PublicKey, 'parsed from application/magic-key' do
+describe MagicSig::PublicKey, 'parsed from application/magic-key' do
   before do
-    @public_key = Salmon::PublicKey.parse_magic_key(
+    @public_key = MagicSig::PublicKey.parse_magic_key(
       'RSA.mVgY8RN6URBTstndvmUUPb4UZTdwvwmddSKE5z_jvKU' +
       'EK6yk1u3rrC9yN8k6FilGj9K0eeUPe2hf4Pj-5CmHww.AQAB'
     )
@@ -38,9 +38,9 @@ describe Salmon::PublicKey, 'parsed from application/magic-key' do
   it_should_behave_like 'normal public keys'
 end
 
-describe Salmon::PublicKey, 'parsed from application/magic-key with zeroes' do
+describe MagicSig::PublicKey, 'parsed from application/magic-key with zeroes' do
   before do
-    @public_key = Salmon::PublicKey.parse_magic_key(
+    @public_key = MagicSig::PublicKey.parse_magic_key(
       'RSA.AJlYGPETelEQU7LZ3b5lFD2-FGU3cL8JnXUihOc_47' +
       'ylBCuspNbt66wvcjfJOhYpRo_StHnlD3toX-D4_uQph8M.AQAB'
     )
@@ -49,9 +49,9 @@ describe Salmon::PublicKey, 'parsed from application/magic-key with zeroes' do
   it_should_behave_like 'normal public keys'
 end
 
-describe Salmon::PublicKey, 'parsed from .pem' do
+describe MagicSig::PublicKey, 'parsed from .pem' do
   before do
-    @public_key = Salmon::PublicKey.parse_pem(<<-PEM
+    @public_key = MagicSig::PublicKey.parse_pem(<<-PEM
 -----BEGIN RSA PUBLIC KEY-----
 MEgCQQCZWBjxE3pREFOy2d2+ZRQ9vhRlN3C/CZ11IoTnP+O8pQQrrKTW7eusL3I3
 yToWKUaP0rR55Q97aF/g+P7kKYfDAgMBAAE=
@@ -63,9 +63,9 @@ PEM
   it_should_behave_like 'normal public keys'
 end
 
-describe Salmon::PublicKey, 'parsed from .der' do
+describe MagicSig::PublicKey, 'parsed from .der' do
   before do
-    @public_key = Salmon::PublicKey.parse_der(
+    @public_key = MagicSig::PublicKey.parse_der(
       "0H\002A\000\231X\030\361\023zQ\020S\262\331\335\276e\024=\276\024e7p" +
       "\277\t\235u\"\204\347?\343\274\245\004+\254\244\326\355\353\254/r7" +
       "\311:\026)F\217\322\264y\345\017{h_\340\370\376\344)\207\303\002" +
@@ -76,7 +76,7 @@ describe Salmon::PublicKey, 'parsed from .der' do
   it_should_behave_like 'normal public keys'
 end
 
-describe Salmon::PublicKey, 'constructed from a modulus and exponent' do
+describe MagicSig::PublicKey, 'constructed from a modulus and exponent' do
   before do
     modulus = (
       '803128378907519656502289154656359136834494406215410' +
@@ -84,7 +84,7 @@ describe Salmon::PublicKey, 'constructed from a modulus and exponent' do
       '4493461257620351548796452092307094036643522661681091'
     ).to_i
     exponent = '65537'.to_i
-    @public_key = Salmon::PublicKey.new(modulus, exponent)
+    @public_key = MagicSig::PublicKey.new(modulus, exponent)
   end
 
   it 'should generate application/magic-key correctly' do
@@ -112,8 +112,8 @@ PEM
     )
   end
 
-  it 'should generate a magic signature key ID correctly' do
-    @public_key.to_key_id.should == (
+  it 'should generate a default key ID correctly' do
+    @public_key.key_id.should == (
       'ATyfAWA5nA6s62uvxAZTwyciKnFDtl9hCpzZwMVi0PQ'
     )
   end

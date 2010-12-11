@@ -14,30 +14,30 @@
 
 require 'spec_helper'
 
-require 'salmon'
+require 'magicsig'
 
-describe Salmon do
+describe MagicSig do
   # Ugly-looking test data carefully designed to cover as much of the
   # base64url algorithm as possible.
 
   it 'should encode data correctly' do
-    Salmon.base64url_encode('2`?33>]').should == 'MmA_MzM-XQ'
-    Salmon.base64url_encode('  ').should == 'ICA'
+    MagicSig.base64url_encode('2`?33>]').should == 'MmA_MzM-XQ'
+    MagicSig.base64url_encode('  ').should == 'ICA'
   end
 
   it 'should decode data correctly' do
-    Salmon.base64url_decode('MmA_MzM-XQ').should == '2`?33>]'
-    Salmon.base64url_decode('ICA').should == '  '
+    MagicSig.base64url_decode('MmA_MzM-XQ').should == '2`?33>]'
+    MagicSig.base64url_decode('ICA').should == '  '
   end
 
   it 'should decode data correctly despite whitespace' do
-    Salmon.base64url_decode("     MmA_M\n\t  zM-XQ   ").should == '2`?33>]'
-    Salmon.base64url_decode("  IC\nA\t  ").should == '  '
+    MagicSig.base64url_decode("     MmA_M\n\t  zM-XQ   ").should == '2`?33>]'
+    MagicSig.base64url_decode("  IC\nA\t  ").should == '  '
   end
 
   it 'should convert encoded data to integer correctly' do
-    Salmon.base64url_to_i('AQAB').should == 65537
-    Salmon.base64url_to_i((
+    MagicSig.base64url_to_i('AQAB').should == 65537
+    MagicSig.base64url_to_i((
       'mVgY8RN6URBTstndvmUUPb4UZTdwvwmddSKE5z_jvKU' +
       'EK6yk1u3rrC9yN8k6FilGj9K0eeUPe2hf4Pj-5CmHww'
     )).should == (
@@ -48,7 +48,7 @@ describe Salmon do
   end
 
   it 'should convert encoded data with zeroes to integer correctly' do
-    Salmon.base64url_to_i((
+    MagicSig.base64url_to_i((
       'AJlYGPETelEQU7LZ3b5lFD2-FGU3cL8JnXUihOc_47' +
       'ylBCuspNbt66wvcjfJOhYpRo_StHnlD3toX-D4_uQph8M'
     )).should == (
@@ -59,8 +59,8 @@ describe Salmon do
   end
 
   it 'should convert integer to encoded data correctly' do
-    Salmon.i_to_base64url(65537).should == 'AQAB'
-    Salmon.i_to_base64url((
+    MagicSig.i_to_base64url(65537).should == 'AQAB'
+    MagicSig.i_to_base64url((
       '803128378907519656502289154656359136834494406215410' +
       '050964539889229343337085989194330643990745488374753' +
       '4493461257620351548796452092307094036643522661681091'
@@ -71,21 +71,21 @@ describe Salmon do
   end
 
   it 'should convert encoded data to an integer and back correctly' do
-    Salmon.i_to_base64url(
-      Salmon.base64url_to_i('AQAB')
+    MagicSig.i_to_base64url(
+      MagicSig.base64url_to_i('AQAB')
     ).should == 'AQAB'
     encoded_data = (
       'mVgY8RN6URBTstndvmUUPb4UZTdwvwmddSKE5z_jvKU' +
       'EK6yk1u3rrC9yN8k6FilGj9K0eeUPe2hf4Pj-5CmHww'
     )
-    Salmon.i_to_base64url(
-      Salmon.base64url_to_i(encoded_data)
+    MagicSig.i_to_base64url(
+      MagicSig.base64url_to_i(encoded_data)
     ).should == encoded_data
   end
 
   it 'should convert integer to encoded data and back correctly' do
     for n in (2 ** 1000 .. 2 ** 1000 + 1000)
-      Salmon.base64url_to_i(Salmon.i_to_base64url(n)).should == n
+      MagicSig.base64url_to_i(MagicSig.i_to_base64url(n)).should == n
     end
   end
 end

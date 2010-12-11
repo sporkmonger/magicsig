@@ -1,4 +1,4 @@
-module Salmon
+module MagicSig
   class Signature
     def value
       @value ||= nil
@@ -8,12 +8,12 @@ module Salmon
       @value = new_value
     end
 
-    def keyhash
-      @keyhash ||= nil
+    def key_id
+      @key_id ||= nil
     end
 
-    def keyhash=(new_keyhash)
-      @keyhash = new_keyhash
+    def key_id=(new_key_id)
+      @key_id = new_key_id
     end
 
     def parse_json(data)
@@ -24,7 +24,7 @@ module Salmon
         raise TypeError, "Expected Hash or String, got #{data.class}."
       end
       self.value = data['value']
-      self.keyhash = data['keyhash']
+      self.key_id = data['key_id']
       return self
     end
 

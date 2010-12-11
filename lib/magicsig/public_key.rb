@@ -1,7 +1,7 @@
-require 'salmon'
+require 'magicsig'
 require 'openssl'
 
-module Salmon
+module MagicSig
   class PublicKey
     MAGIC_KEY_PATTERN = /^RSA\.([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/
 
@@ -13,15 +13,26 @@ module Salmon
     attr_reader :modulus
     attr_reader :exponent
 
+    def key_id=(new_key_id)
+      @key_id = new_key_id
+    end
+
+    def key_id
+      @key_id ||= MagicSig.base64url_encode(
+        OpenSSL::Digest::SHA256.new(self.to_s).digest
+      )
+      return @key_id
+    end
+
     def ==(other)
-      return false unless other.kind_of?(Salmon::PublicKey)
+      return false unless other.kind_of?(MagicSig::PublicKey)
       return self.modulus == other.modulus && self.exponent == other.exponent
     end
 
     def to_s
       return (
-        "RSA.#{Salmon.i_to_base64url(modulus)}." +
-        "#{Salmon.i_to_base64url(exponent)}"
+        "RSA.#{MagicSig.i_to_base64url(modulus)}." +
+        "#{MagicSig.i_to_base64url(exponent)}"
       )
     end
 
@@ -43,24 +54,17 @@ module Salmon
       return @openssl_key
     end
 
-    def to_key_id
-      @keyhash ||= Salmon.base64url_encode(
-        OpenSSL::Digest::SHA256.new(self.to_s).digest
-      )
-      return @keyhash
-    end
-
     def self.parse_magic_key(data)
       modulus, exponent = data.match(MAGIC_KEY_PATTERN)[1..2]
-      return Salmon::PublicKey.new(
-        Salmon.base64url_to_i(modulus),
-        Salmon.base64url_to_i(exponent)
+      return MagicSig::PublicKey.new(
+        MagicSig.base64url_to_i(modulus),
+        MagicSig.base64url_to_i(exponent)
       )
     end
 
     def self.parse_pem(data)
       openssl_key = OpenSSL::PKey::RSA.new(data)
-      return Salmon::PublicKey.new(openssl_key.n, openssl_key.e)
+      return MagicSig::PublicKey.new(openssl_key.n, openssl_key.e)
     end
     class <<self
       alias_method :parse_der, :parse_pem
